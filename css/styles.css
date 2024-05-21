@@ -1,0 +1,11 @@
+.overlay-buttons {
+    position: relative;
+    width: 150px; /* Avatar genişliğiyle aynı */
+    height: 300px;
+}
+
+.avatar-canvas {
+        position: relative;
+        width: 100%;
+        height: auto;
+}
