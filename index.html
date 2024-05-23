@@ -17,22 +17,7 @@
     <script src="./js/webgl/MV.js"></script>
     <script src="./js/scripts.js"></script>
     <script src="./js/getter.js"></script>
-    <script id="vertex-shader" type="x-shader/x-vertex">
-        attribute vec4 vPosition;
-    
-        void main() {
-            gl_Position = vPosition;
-        }
-    </script>
-    
-    <script id="skin-fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
-        uniform vec4 u_SkinColor;
-        
-        void main() {
-            gl_FragColor = u_SkinColor;
-        }
-    </script>
+    <script src="./js/keyboardControls.js"></script>
   </head>
   <body class="bg-slate-600">
     <div class="grid grid-cols-4 gap-3 m-5 h-full">
@@ -60,29 +45,42 @@
             style="width: 50px"
           >
             <button
-              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
-              id="download-button"
+            onclick="onSelectObjectChange('head')"
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12 part-buttons"
+              id="head-button"
             >
               <i class="fa-regular fa-xl fa-face-smile"></i>
             </button>
             <button
-              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
-              id="download-button"
+            onclick="onSelectObjectChange('body')"
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12 part-buttons"
+              id="body-button"
             >
               <i class="fa-solid fa-xl fa-child"></i>
             </button>
             <button
-              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
-              id="download-button"
+            onclick="onSelectObjectChange('eye')"
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12 part-buttons"
+              id="eye-button"
             >
               <i class="fa-solid fa-xl fa-eye"></i>
             </button>
             <button
-              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
-              id="download-button"
+            onclick="onSelectObjectChange('clothes')"
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12 part-buttons"
+              id="clothes-button"
             >
               <i class="fa-solid fa-xl fa-shirt"></i>
             </button>
+          </div>
+        </div>
+        <div class="px-6 pb-4 text-white">
+          <span class="font-bold">Keyboard Controls:</span>
+          <div id="keyboard-controls" class="text-slate-500">
+            Left Arrow - Moves Eyes Left <br>
+            Right Arrow - Moves Eyes Right <br>
+            Up - Moves Up <br>
+            Down - Moves Down <br>
           </div>
         </div>
       </div>
@@ -102,7 +100,33 @@
           </div>
           <div class="flex justify-between pt-4">
             <div class="text-white" id="eye-color">Eye Color</div>
-            <input type="color" id="eye-color-picker" value="#000000" />
+            <input type="color" id="eye-color-picker" value="#FF0000" />
+            <div class="text-white" id="eye-color">Eye X</div>
+            <input
+              type="range"
+              id="eye-x-slider"
+              min="1"
+              max="100"
+              value="22"
+            />
+            <div class="text-white" id="eye-color">Eye Y</div>
+            <input
+              type="range"
+              id="eye-y-slider"
+              min="1"
+              max="100"
+              value="8"
+            />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="eye-color">Eye Separation</div>
+            <input
+              type="range"
+              id="eye-separation-slider"
+              min="1"
+              max="100"
+              value="50"
+            />
           </div>
           <div class="flex justify-between pt-4">
             <div class="text-white" id="skin-color">Skin Color</div>

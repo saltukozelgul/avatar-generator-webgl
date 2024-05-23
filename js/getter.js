@@ -11,7 +11,11 @@ function getColorWithElementId(id) {
     return color;
 }
 
-function getValueWithElementId(id) {
+function getValueWithElementId(id, isPercent) {
     var element = document.getElementById(id);
-    return parseFloat(element.value / 100);
+    var value = element.value;
+    if (isPercent) {
+        value = parseFloat(value) / 100;
+    }
+    return parseFloat(value);
 }
