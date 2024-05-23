@@ -1,85 +1,167 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3D Avatar Creator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/js/tailwind_conf.js"></script>
-</head>
-<body class="bg-slate-600">
+    <script src="./js/webgl/initShaders.js"></script>
+    <script src="./js/webgl/webgl-utils.js"></script>
+    <script src="./js/webgl/MV.js"></script>
+    <script src="./js/scripts.js"></script>
+    <script src="./js/getter.js"></script>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        attribute vec4 vPosition;
+    
+        void main() {
+            gl_Position = vPosition;
+        }
+    </script>
+    
+    <script id="skin-fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+        uniform vec4 u_SkinColor;
+        
+        void main() {
+            gl_FragColor = u_SkinColor;
+        }
+    </script>
+  </head>
+  <body class="bg-slate-600">
     <div class="grid grid-cols-4 gap-3 m-5 h-full">
-        <div class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-full" style="width: 335px;">
-            <div class="card-header">
-                <div class="font-bold text-xl mb-2 text-white px-6 pt-4">Avatar Preview</div>
-                <hr class="mx-2">
-            </div>
-            <div class="card-content px-6 py-4 flex">
-                <!--- Burada webGl canvası --->
-                <canvas class="bg-white" id="avatar-canvas" width="250" height="400"></canvas>
-                <div id="buttons" class="text-white font-bold p-2 rounded" style="width: 50px;">
-                    <button class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12" id="download-button"> 
-                        <i class="fa-regular fa-xl fa-face-smile"></i>
-                    </button>
-                    <button class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12" id="download-button"> 
-                        <i  class="fa-solid fa-xl fa-child"></i>
-                    </button>
-                    <button class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12" id="download-button"> 
-                        <i class="fa-solid fa-xl fa-eye"></i>
-                    </button>
-                    <button class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12" id="download-button"> 
-                        <i class="fa-solid  fa-xl fa-shirt"></i>
-                    </button>
-                </div>
-            </div>
+      <div
+        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-full"
+        style="width: 335px"
+      >
+        <div class="card-header">
+          <div class="font-bold text-xl mb-2 text-white px-6 pt-4">
+            Avatar Preview
+          </div>
+          <hr class="mx-2" />
         </div>
-        <div class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2 col-span-2">
-            <div class="card-header">
-                <div class="font-bold text-xl mb-2 text-white px-6 pt-4">Settings</div>
-                <hr class="mx-2">
-            </div>
-            <div class="card-content px-6 py-4">
-                <div class="flex justify-between">
-                    <div class="text-white" id="hair-color">Hair Color</div>
-                    <input type="color" id="hair-color-picker" value="#000000">
-                </div>
-                <div class="flex justify-between pt-4">
-                    <div class="text-white" id="eye-color">Eye Color</div>
-                    <input type="color" id="eye-color-picker" value="#000000">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="flex justify-between pt-4">
-                        <div class="text-white" id="chin-width">Chin Width</div>
-                        <input type="range" id="chin-width-slider" min="0" max="100" value="50">  
-                    </div>
-                    <div class="flex justify-between pt-4">
-                        <div class="text-white" id="chin-height">Chin Height</div>
-                        <input type="range" id="chin-height-slider" min="0" max="100" value="50">
-                    </div> 
-                </div>
-            </div>
+        <div class="card-content px-6 py-4 flex">
+          <!--- Burada webGl canvası --->
+          <canvas
+            class="bg-white"
+            id="avatar-canvas"
+            width="250"
+            height="400"
+          ></canvas>
+          <div
+            id="buttons"
+            class="text-white font-bold p-2 rounded"
+            style="width: 50px"
+          >
+            <button
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
+              id="download-button"
+            >
+              <i class="fa-regular fa-xl fa-face-smile"></i>
+            </button>
+            <button
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
+              id="download-button"
+            >
+              <i class="fa-solid fa-xl fa-child"></i>
+            </button>
+            <button
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
+              id="download-button"
+            >
+              <i class="fa-solid fa-xl fa-eye"></i>
+            </button>
+            <button
+              class="bg-slate-600 hover:bg-slate-700 text-white font-bold p-2 my-1 rounded w-12"
+              id="download-button"
+            >
+              <i class="fa-solid fa-xl fa-shirt"></i>
+            </button>
+          </div>
         </div>
-        <div class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2">
-            <div class="card-header">
-                <div class="font-bold text-xl mb-2 text-white px-6 pt-4">Environment</div>
-                <hr class="mx-2">
-            </div>
-            <div class="card-content px-6 py-4">
-                <div class="flex justify-between">
-                    <div class="text-white" id="light-color">Light Color</div>
-                    <input type="color" id="light-color-picker" value="#000000">
-                </div>
-                <div class="flex justify-between pt-4">
-                    <div class="text-white" id="background-color">Background Color</div>
-                    <input type="color" id="background-color-picker" value="#000000">
-                </div>
-                <div class="flex justify-between pt-4">
-                    <div class="text-white" id="brightness">Brightness</div>
-                    <input type="range" id="brightness-slider" min="0" max="100" value="50">
-                </div>
-            </div>
+      </div>
+      <div
+        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2 col-span-2"
+      >
+        <div class="card-header">
+          <div class="font-bold text-xl mb-2 text-white px-6 pt-4">
+            Settings
+          </div>
+          <hr class="mx-2" />
         </div>
+        <div class="card-content px-6 py-4">
+          <div class="flex justify-between">
+            <div class="text-white" id="hair-color">Hair Color</div>
+            <input type="color" id="hair-color-picker" value="#000000" />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="eye-color">Eye Color</div>
+            <input type="color" id="eye-color-picker" value="#000000" />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="skin-color">Skin Color</div>
+            <input type="color" id="skin-color-picker" value="#000000" />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex justify-between pt-4">
+              <div class="text-white" id="chin-width">Chin Width</div>
+              <input
+                type="range"
+                id="chin-width-slider"
+                min="0"
+                max="100"
+                value="50"
+              />
+            </div>
+            <div class="flex justify-between pt-4">
+              <div class="text-white" id="chin-height">Chin Height</div>
+              <input
+                type="range"
+                id="chin-height-slider"
+                min="0"
+                max="100"
+                value="50"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2"
+      >
+        <div class="card-header">
+          <div class="font-bold text-xl mb-2 text-white px-6 pt-4">
+            Environment
+          </div>
+          <hr class="mx-2" />
+        </div>
+        <div class="card-content px-6 py-4">
+          <div class="flex justify-between">
+            <div class="text-white" id="light-color">Light Color</div>
+            <input type="color" id="light-color-picker" value="#000000" />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="background-color">Background Color</div>
+            <input type="color" id="background-color-picker" value="#000000" />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="brightness">Brightness</div>
+            <input
+              type="range"
+              id="brightness-slider"
+              min="0"
+              max="100"
+              value="50"
+            />
+          </div>
+        </div>
+      </div>
     </div>
-</body>
+  </body>
 </html>
