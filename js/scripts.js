@@ -2,7 +2,7 @@ var canvas
 var gl
 
 // Bu klavyenin hangi objeyi haraket ettireceğini belirler.
-var selectedObject = null;
+var selectedObject = 'eye';
 
 var program;
 var thetaLoc;
