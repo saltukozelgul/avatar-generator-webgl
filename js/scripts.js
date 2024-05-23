@@ -35,7 +35,7 @@ function drawHead() {
         var theta = i * 2 * Math.PI / numSlices;
         var x = Math.cos(theta);
         var y = Math.sin(theta);
-        vertices.push(vec3(x*0.5, y / 1.6 * 0.5, 0));
+        vertices.push(vec3(x*getValueWithElementId('head-width-slider'), y / 1.6 * getValueWithElementId('head-height-slider'), 0));
     }
 
     var bufferId = gl.createBuffer();
@@ -48,7 +48,6 @@ function drawHead() {
 
     // skin color
     var skinColor = getColorWithElementId("skin-color-picker")
-    console.log(skinColor   )
     var skinColorLoc = gl.getUniformLocation(program, "u_SkinColor");
     gl.uniform4fv(skinColorLoc, flatten(skinColor));
 
@@ -58,8 +57,6 @@ function drawHead() {
 
 function render()
 {
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
     drawHead(program);
     requestAnimFrame( render );
 }

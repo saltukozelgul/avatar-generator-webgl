@@ -10,3 +10,8 @@ function getColorWithElementId(id) {
     color = vec4(r, g, b, a);
     return color;
 }
+
+function getValueWithElementId(id) {
+    var element = document.getElementById(id);
+    return parseFloat(element.value / 100);
+}
