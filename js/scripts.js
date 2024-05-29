@@ -25,29 +25,54 @@ function drawHead(modelViewMatrix, projectionMatrix) {
     var vertexShader = `
     attribute vec4 vPosition;
     attribute vec4 vColor;
+    attribute vec3 vNormal;
+    
     uniform mat4 u_ModelViewMatrix;
     uniform mat4 u_ProjectionMatrix;
+    uniform mat3 u_NormalMatrix;
+    
     varying vec4 v_Color;
-
+    varying vec3 v_NormalInterp;
+    varying vec3 v_FragPos;
+    
     void main() {
         gl_Position = u_ProjectionMatrix * u_ModelViewMatrix * vPosition;
         v_Color = vColor;
+        v_FragPos = vec3(u_ModelViewMatrix * vPosition);
+        v_NormalInterp = normalize(u_NormalMatrix * vNormal);
     }
     `;
+    
 
     // fragment shader
     var fragmentShader = `
     precision mediump float;
+    
     varying vec4 v_Color;
-
+    varying vec3 v_NormalInterp;
+    varying vec3 v_FragPos;
+    
+    uniform vec3 u_LightPos;
+    uniform vec4 u_LightColor;
+    uniform vec4 u_AmbientLight;
+    
     void main() {
-        gl_FragColor = v_Color;
+        vec3 norm = normalize(v_NormalInterp);
+        vec3 lightDir = normalize(u_LightPos - v_FragPos);
+    
+        float diff = max(dot(norm, lightDir), 0.0);
+        vec4 diffuse = diff * u_LightColor;
+    
+        vec4 ambient = u_AmbientLight;
+    
+        gl_FragColor = (ambient + diffuse) * v_Color;
     }
     `;
-
     var program = initShadersWithSource(gl, vertexShader, fragmentShader);
     gl.useProgram(program);
 
+    // Calculate normals for the sphere
+    var normals = [];
     var vertices = [];
     var colors = [];
     var latitudeBands = 30;
@@ -67,11 +92,11 @@ function drawHead(modelViewMatrix, projectionMatrix) {
             var y = cosTheta;
             var z = sinPhi * sinTheta;
 
+            normals.push(vec3(x, y, z));
             vertices.push(vec3(x * getValueWithElementId('head-width-slider', true) / 10,
                                y * getValueWithElementId('head-height-slider', true) / 10,
                                z * getValueWithElementId('head-depth-slider', true) / 10));
-            // Assign a random color to each vertex for demonstration purposes
-            colors.push(vec4(Math.random(), Math.random(), Math.random(), 1.0));
+            colors.push(getColorWithElementId('skin-color-picker'));
         }
     }
 
@@ -85,34 +110,61 @@ function drawHead(modelViewMatrix, projectionMatrix) {
         }
     }
 
+    // Bind vertex buffer
     var vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+    var vPosition = gl.getAttribLocation(program, "vPosition");
+    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vPosition);
 
+    // Bind color buffer
     var colorBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW);
+    var vColor = gl.getAttribLocation(program, "vColor");
+    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vColor);
 
+    // Bind normal buffer
+    var normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW);
+    var vNormal = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(vNormal, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vNormal);
+
+    // Bind index buffer
     var indexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    gl.vertexAttribPointer(vPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPosition);
-
-    var vColor = gl.getAttribLocation(program, "vColor");
-    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.vertexAttribPointer(vColor, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vColor);
-
+    // Set uniform matrices
     var projectionMatrixLoc = gl.getUniformLocation(program, "u_ProjectionMatrix");
     gl.uniformMatrix4fv(projectionMatrixLoc, false, flatten(projectionMatrix));
 
     var modelViewMatrixLoc = gl.getUniformLocation(program, "u_ModelViewMatrix");
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(modelViewMatrix));
 
+    var normalMatrixLoc = gl.getUniformLocation(program, "u_NormalMatrix");
+    var normalMatrix = normalMatrixx(modelViewMatrix);
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
+
+    // Set light uniforms
+    var lightPos = vec3(0.0, 0.0, 10.0);
+    var lightColor = vec4(1.0, 1.0, 1.0, 1.0);
+    var ambientLight = vec4(0.2, 0.2, 0.2, 1.0);
+
+    var lightPosLoc = gl.getUniformLocation(program, "u_LightPos");
+    gl.uniform3fv(lightPosLoc, flatten(lightPos));
+
+    var lightColorLoc = gl.getUniformLocation(program, "u_LightColor");
+    gl.uniform4fv(lightColorLoc, flatten(lightColor));
+
+    var ambientLightLoc = gl.getUniformLocation(program, "u_AmbientLight");
+    gl.uniform4fv(ambientLightLoc, flatten(ambientLight));
+
+    // Draw the object
     gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 }
 
@@ -187,23 +239,18 @@ function drawEyes() {
 }
 
 function render() {
-    // Clear the canvas before drawing
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // Get camera position from sliders
     var camX = getValueWithElementId('camera-x-slider', true);
     var camY = getValueWithElementId('camera-y-slider', true);
     var camZ = getValueWithElementId('camera-z-slider', true);
 
-    // Projection and ModelView matrices
     var projectionMatrix = perspective(45, canvas.width / canvas.height, 0.1, 100);
     var modelViewMatrix = lookAt(vec3(camX, camY, camZ), vec3(0, 0, 0), vec3(0, 1, 0));
 
-    // Draw head with updated camera
     drawHead(modelViewMatrix, projectionMatrix);
-
-    // Draw eyes
     drawEyes();
 
     requestAnimFrame(render);
 }
+

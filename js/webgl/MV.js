@@ -426,6 +426,26 @@ function scalem( x, y, z )
     return result;
 }
 
+function normalMatrixx(modelViewMatrix) {
+    var upperLeft3x3 = mat3();
+    
+    // Extract the upper-left 3x3 portion of the modelViewMatrix
+    for (var i = 0; i < 3; i++) {
+        for (var j = 0; j < 3; j++) {
+            upperLeft3x3[i][j] = modelViewMatrix[i][j];
+        }
+    }
+
+    // Calculate the inverse of the 3x3 matrix
+    upperLeft3x3 = inverse3(upperLeft3x3);
+
+    // Transpose the 3x3 matrix
+    upperLeft3x3 = transpose(upperLeft3x3);
+
+    return upperLeft3x3;
+}
+
+
 //----------------------------------------------------------------------------
 //
 //  ModelView Matrix Generators
