@@ -85,7 +85,8 @@
         </div>
       </div>
       <div
-        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2 col-span-2"
+        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg col-span-2"
+        style="height: 500px;"
       >
         <div class="card-header">
           <div class="font-bold text-xl mb-2 text-white px-6 pt-4">
@@ -154,10 +155,51 @@
               />
             </div>
           </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="head-depth">Head Depth</div>
+            <input
+              type="range"
+              id="head-depth-slider"
+              min="1"
+              max="100"
+              value="50"
+            />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="camera-x">x</div>
+            <input
+              type="range"
+              id="camera-x-slider"
+              min="1"
+              max="100"
+              value="50"
+            />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="camera-y">y</div>
+            <input
+              type="range"
+              id="camera-y-slider"
+              min="1"
+              max="100"
+              value="50"
+            />
+          </div>
+          <div class="flex justify-between pt-4">
+            <div class="text-white" id="camera-z">z</div>
+            <input
+              type="range"
+              id="camera-z-slider"
+              min="1"
+              max="100"
+              value="50"
+            />
+          </div>
         </div>
       </div>
       <div
-        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg h-1/2"
+        class="max-w rounded-2xl overflow-hidden bg-slate-800 shadow-lg"
+        style="height: 500px;"
       >
         <div class="card-header">
           <div class="font-bold text-xl mb-2 text-white px-6 pt-4">
